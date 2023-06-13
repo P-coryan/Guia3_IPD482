@@ -1,6 +1,7 @@
 figure(1), hold on
 clear all,
 clc,
+close all,
 xlim([-5 10]);
 ylim([-5 10]);
 global maxRange;
@@ -56,6 +57,7 @@ H1 = plotRobot(robot);      % Robot odometrico
 H2 = plotRobot2(robot2);   % Robot real
 %Genero un bucle para controlar el camino del robot
 
+%%
 for cont = 2:length(xx)-1
     delete(H1);
     delete(H2);
@@ -109,6 +111,7 @@ for cont = 2:length(xx)-1
     
     H1=plotRobot(robot);
     H2=plotRobot2(robot2);
-    pause(pasoTiempo);
+%     pause(pasoTiempo);
+    pause(1e-4);
     delete(H3);
 end
