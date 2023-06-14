@@ -5,8 +5,12 @@ close all,
 xlim([-5 10]);
 ylim([-5 10]);
 global maxRange;
+% global nubePtos;
+
 maxRange = 10; %Distancia máxima del laser
 % axis equal
+
+nubePtos = [];
 
 pasoTiempo = 0.1; %Tiempo de Sampling de mi sistema
 
@@ -66,11 +70,12 @@ for cont = 2:length(xx)-1
     H3 = plotLaser(Laser,robot2);
     BuscoPostes = [];
     BuscoPostes = DeteccionPostes(Laser,robot); %ojo, el robot "cree" que tiene la pose correcta
-    if(~isempty(BuscoPostes))
-        plot(BuscoPostes(:,1),BuscoPostes(:,2),'gx');
-        
-    end
+%     if(~isempty(BuscoPostes))
+%         plot(BuscoPostes(:,1),BuscoPostes(:,2),'gx');
+%         
+%     end
     
+    nubePtos = [nubePtos BuscoPostes];
     
     
     %referencias para el controlador (obviar esta parte) y obtención de las
