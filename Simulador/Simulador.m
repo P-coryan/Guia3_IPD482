@@ -121,108 +121,27 @@ for cont = 2:length(xx)-1
 end
 
 %%
-% Clustering postes Global total
-[idx, isnoise] = dbscan(nubePtos, 0.1, 4);  % (data, dist entre Vecinos, n�Min de Vecinos para formar grupo)
+
+[puntoMedioPoste, errorPoste ,iVerticesPlot, idx] = ClusteringNube(nubePtos, M);
+
+
 figure()
+title('Clustering Nube')
+hold on, grid on
 gscatter(nubePtos(:,1),nubePtos(:,2),idx);
-
-%######### Analisis Grupo 1
-% grupo1 = nubePtos( idx==1 , :);
-% verticesGrupo1plot = grupo1(convhull(grupo1), :);
-% verticesGrupo1 = unique(grupo1(convhull(grupo1), :), 'rows');   % delete punto inicial=punto final
-
-% Distancia entre vertices Grupo 1
-% distGrupo1 = zeros(length(verticesGrupo1));
-% for i=1:length(verticesGrupo1)
-%     for j=1:length(verticesGrupo1)
-%        distGrupo1(i,j) = norm(verticesGrupo1(i,:) - verticesGrupo1(j,:));
-%     end
-% end
-% % Distancia maxima de vertices Grupo 1
-% [ a,~ ] = find( distGrupo1== max(max(distGrupo1)) ); 
-% % Puntos vertices Grupo 1 con mayor distancia
-% pG1 = [verticesGrupo1(a(1),:) ; verticesGrupo1(a(2),:)];
-% % Punto medio del Grupo 1 (posicion del poste)
-% pmG1 = (pG1(1,:) + pG1(2,:))/2;
-% 
-% % Error distancia Grupo 1 (analiza todos los postes para encontrar a su original)
-% error_pmG1 = 100; %  norm( M(1,:) - pmG1 );
-% for i = 1:length(M(:,1))
-%     if norm( M(i,:) - pmG1 ) < error_pmG1 
-%         error_pmG1 = norm( M(i,:) - pmG1 );
-%         posteNro = i;
-%     end
-% end
-
-
-% Analisis por grupo
-idx(idx <0) = []; % elimina idx = -1
-
-posteYgrupo = zeros(length(M(:,1)), 1); % |idx | poste |
-pmPostes = zeros(length(idx), 2);
-
-hold on
-for i = 1:length(unique(idx))
-    iGrupo = nubePtos(idx == i, :);
-    iVerticesPlot = iGrupo(convhull(iGrupo), :);
-    iVertices = unique(iGrupo(convhull(iGrupo), :), 'rows'); % borra punto final = punto inicial 
-
-    % Distancia entre vertices
-    distGi = zeros(length(iVertices));
-    for j=1:length(iVertices)
-        for k=1:length(iVertices)
-            distGi(j,k) = norm(iVertices(j,:) - iVertices(k,:));
-        end
-    end
-    
-    % Encuentra distancia maxima entre vertices
-    [a, ~] = find(distGi == max(max(distGi)));
-    pGi = [iVertices(a(1),:); iVertices(a(2),:)];
-    PMi = (pGi(1,:) + pGi(2,:))/2;
-    pmPostes(i,:) = PMi;
-    
-    % Encuentra el poste con menos distancia
-    EDi = 100;
-    posteID = 0;
-    for j =1:length(M(:,1))
-        if norm(M(i,:) - PMi) < EDi
-            EDi = norm(M(i,:) - PMi);
-            posteID = j;
-        end
-    end
-
-    % Se agrupa el poste y el grupo que le corresponde
-    posteYgrupo(i) = posteID;
-
-%     plot(pGi(:,1), pGi(:,2) , '.-b','MarkerSize', 25)
-    plot( PMi(1) , PMi(2) ,'.r','MarkerSize', 25)
-%     pause(1);
-end
-
-
-
-
-figure()
-hold on
-plot(grupo1(:,1), grupo1(:,2),'.m')
-plot(verticesGrupo1plot(:,1), verticesGrupo1plot(:,2),'g')
-
-plot(pG1(:,1), pG1(:,2) , '.-b','MarkerSize', 25)
-plot( pmG1(1) , pmG1(2) ,'.r','MarkerSize', 25)
-plot(M(posteNro,1), M(posteNro,2), 'ob')
-
+plot( puntoMedioPoste(:,1) , puntoMedioPoste(:,2) ,'.k','MarkerSize', 25)   % punto medio estimado
+plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')
 
 
 %% Postes Globales
 figure
 title('Deteccion de Postes Eje global')
-plot(M(:,1), M(:,2), 'ob')
-hold on
-plot(nubePtos(:,1), nubePtos(:,2),'.r')
-for i = 1:length(Vertices(:,1))
-    plot(Vertices(i,1), Vertices(i,2), '.g', 'MarkerSize', 25)
-    plot(Vertices(i,1), Vertices(i,2), '.g', 'MarkerSize', 25)
-    plot(Vertices(i,1), Vertices(i,2), '.g', 'MarkerSize', 25)
-    plot(Vertices(i,1), Vertices(i,2), '.g', 'MarkerSize', 25)
-end
+hold on, grid on
+plot(M(:,1), M(:,2), 'ob')                                  % Postes verdaderos
+plot(nubePtos(:,1), nubePtos(:,2),'.r')                     % Nube de datos LiDar
+plot(Vertices(:,1), Vertices(:,2), '.k', 'MarkerSize', 15)  % Vertices verdaderos
+plot( puntoMedioPoste(:,1) , puntoMedioPoste(:,2) ,'.g','MarkerSize', 25)           % Postes estimados
+plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')            % Vertices estimados
+
+
 
