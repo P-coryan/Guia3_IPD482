@@ -52,7 +52,7 @@ robot2 = robot; %es el robot real
 %ambos robots empiezan en el mismo lugar
 
 %Grafico ambos robots (odom�trico y real)
-H1 = plotRobot(robot);      % Robot odometrico
+H1 = plotRobot(robot);      % Robot odometrico (error, al parecer!)
 H2 = plotRobot2(robot2);    % Robot real
 
 % Inicializacion Nube de Puntos Global
@@ -122,7 +122,7 @@ end
 
 %%
 
-[puntoMedioPoste, errorPoste ,iVerticesPlot, idx] = ClusteringNube(nubePtos, M);
+[puntoMedioPoste, errorPoste , errorCoordenada, posteYgrupo, idx] = ClusteringNube(nubePtos, M);
 
 
 figure()
@@ -130,8 +130,29 @@ title('Clustering Nube')
 hold on, grid on
 gscatter(nubePtos(:,1),nubePtos(:,2),idx);
 plot( puntoMedioPoste(:,1) , puntoMedioPoste(:,2) ,'.k','MarkerSize', 25)   % punto medio estimado
-plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')
+% plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')
 
+
+% M
+caractM = puntoMedioPoste;
+cantM = length(caractM(:,1));
+CP = cell(cantM,1);
+
+for i=1:cantM
+    eX = abs(errorCoordenada(i, 1));
+    eY = abs(errorCoordenada(i, 2));
+    CP{i} = [eX 0; 0 eY];
+end
+
+% largoGrupos = length(unique(idx))-1;
+% covNP= cell(cantM,1);
+% for i=1:cantM
+%     vX = var(nubePtos( idx==i , 1));
+%     vY = var(nubePtos( idx==i , 2));
+%     covNP{i} = [vX 0; 0 vY];
+% end
+
+covNP = [var(nubePtos(:, 1)) 0 ; 0 var(nubePtos(:, 2))];
 
 %% Postes Globales
 figure

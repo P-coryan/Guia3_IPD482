@@ -1,4 +1,4 @@
-function [PMi, EDi, iVerticesPlot, idx] = ClusteringNube(nubePtos, M)
+function [PMi, EDi, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M)
     % Clustering postes Global total
     [idx, ~] = dbscan(nubePtos, 0.1, 4);  % (data, dist entre Vecinos, n�Min de Vecinos para formar grupo)
 
@@ -9,7 +9,8 @@ function [PMi, EDi, iVerticesPlot, idx] = ClusteringNube(nubePtos, M)
 
     % Error inicializacion
     EDi = ones(length(M(:,1)),1)*100;
-        
+    % Error por coordenada
+    EPC = zeros(length(M(:,1)),2);
     % Verifica el largo del for si hay ruido del cluster (-1)
     if idx(idx <0)
         largoGrupos = length(unique(idx))-1;
@@ -40,7 +41,7 @@ function [PMi, EDi, iVerticesPlot, idx] = ClusteringNube(nubePtos, M)
         % Encuentra el poste con menos distancia
         posteID = 0;
         for j =1:length(M(:,1))
-            if norm(M(j,:) - PMi(i,:)) < EDi(i)
+            if norm(M(j,:) -  PMi(i,:)) < EDi(i)
                 EDi(i) = norm(M(j,:) - PMi(i,:));
                 posteID = j;
             end
@@ -48,7 +49,10 @@ function [PMi, EDi, iVerticesPlot, idx] = ClusteringNube(nubePtos, M)
 
         % Se agrupa el poste y el grupo que le corresponde
         posteYgrupo(i) = posteID;
-
+        
+        % Error de cada coordenada
+        EPC(i,:) = PMi(i,:) - M(posteID,:);
+        
 %         plot(pGi(:,1), pGi(:,2) , '.-b','MarkerSize', 25)     % puntos mas extensos
 %         plot( PMi(i,1) , PMi(i,2) ,'.k','MarkerSize', 25)     % punto medio estimado
 %         plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')
