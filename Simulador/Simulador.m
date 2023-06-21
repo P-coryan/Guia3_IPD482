@@ -43,35 +43,44 @@ plot(xx',yy','-r');
 
 %%
 %Inicializo Robots en el punto de partida del camino generado
+% Robot Odometrico:
 robot.x = X(1);
 robot.y = Y(1);
 robot.tita = atan2(Y(2) - Y(1), X(2) - X(1)); %es la pose del robot seg�n la odometr�a. 
 % Sin embargo, tener presente que el robot "cree" que tiene su pose sin error.
-
-robot2 = robot; %es el robot real
-%ambos robots empiezan en el mismo lugar
+% Robot Real:
+robot2 = robot; % ambos robots empiezan en el mismo lugar
 
 %Grafico ambos robots (odom�trico y real)
-H1 = plotRobot(robot);      % Robot odometrico (error, al parecer!)
+H1 = plotRobot(robot);      % Robot odometrico (con error)
 H2 = plotRobot2(robot2);    % Robot real
 
 % Inicializacion Nube de Puntos Global
-nubePtos = [];
+nubePtos_1 = [];
+nubePtos_2 = [];
 
 % Genero un bucle para controlar el camino del robot
 for cont = 2:length(xx)-1
     delete(H1);
     delete(H2);
     
-    %Sensado de Postes
-    Laser = MedicionConLaserRapido(Vertices, Caras, robot2);
+    % ###########################   
+    %Sensado de Postes (LASER)
+    Laser = MedicionConLaserRapido(Vertices, Caras, robot2);    % Laser con robot original (robot2)
     H3 = plotLaser(Laser,robot2);
     
-    % Deteccion de Postes
-    BuscoPostes = [];
-    BuscoPostes = DeteccionPostes(Laser,robot2); %ojo, el robot "cree" que tiene la pose correcta
-    nubePtos = [nubePtos ; BuscoPostes];
+    % Deteccion de Postes (NUBE DE PUNTOS) Robot real
+    BuscoPostes_1 = [];
+    BuscoPostes_1 = DeteccionPostes(Laser,robot2);         % asignar el robot correspondiente
+    nubePtos_1 = [nubePtos_1 ; BuscoPostes_1];
     
+    % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico
+    BuscoPostes_2 = [];
+    BuscoPostes_2 = DeteccionPostes(Laser,robot);         % asignar el robot correspondiente
+    nubePtos_2 = [nubePtos_2 ; BuscoPostes_2];
+    
+    
+    % ########################### 
     
     %referencias para el controlador (obviar esta parte) y obtenci�n de las
     %se�ales de control
@@ -98,21 +107,22 @@ for cont = 2:length(xx)-1
             Control(2) = 1;
         end
     end
-    V = Control(1);
-    W = Control(2);
+    V = Control(1);     % input u(t)
+    W = Control(2);     % input u(t)
     
-    % Posicion del robot (sin ruido)
+    %####### MODELOS DEL SISTEMA ##########%
+    % Posicion del robot odometrico 
     robot.x = robot.x + pasoTiempo*V*cos(robot.tita);
     robot.y = robot.y + pasoTiempo*V*sin(robot.tita);
     robot.tita = robot.tita + pasoTiempo*W;
     
-    % Posicion del robot real (con ruido)
+    % Posicion del robot real 
     robot2.x = robot2.x + pasoTiempo*V*cos(robot2.tita)+0.001*rand(1,1);
     robot2.y = robot2.y + pasoTiempo*V*sin(robot2.tita)+0.001*rand(1,1);
     robot2.tita = robot2.tita + pasoTiempo*W+0.01*rand(1,1)*W;
     
-    H1=plotRobot(robot);
-    H2=plotRobot2(robot2);
+    H1=plotRobot(robot);        % (gris)
+    H2=plotRobot2(robot2);      % (verde)
 %     pause(pasoTiempo);
     pause(1e-4);
     delete(H1);
@@ -120,49 +130,41 @@ for cont = 2:length(xx)-1
     delete(H3);
 end
 
-%%
-
-[puntoMedioPoste, errorPoste , errorCoordenada, posteYgrupo, idx] = ClusteringNube(nubePtos, M);
-
+%% Pregunta 1 Robot real
+% Obtencion de Caracteristica M y su covarianza
+[caractM_1, cov_caractM_1, error_caractM_1, label_caractM_1, idx_1] = ClusteringNube(nubePtos_1, M);
 
 figure()
-title('Clustering Nube')
+title('Clustering Nube (Robot Real)')
 hold on, grid on
-gscatter(nubePtos(:,1),nubePtos(:,2),idx);
-plot( puntoMedioPoste(:,1) , puntoMedioPoste(:,2) ,'.k','MarkerSize', 25)   % punto medio estimado
-% plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')
+gscatter(nubePtos_1(:,1),nubePtos_1(:,2),idx_1);
+plot( caractM_1(:,1) , caractM_1(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
+
+%% Pregunta 2 Robot Odometrico
+% idem anterior cambiando la deteccionPostes a robot 1 en Linea 79 codigo.
+% Obtencion de Caracteristica M y su covarianza
+[caractM_2, cov_caractM_2, error_caractM_2, label_caractM_2, idx_2] = ClusteringNube(nubePtos_2, M);
+
+figure()
+title('Clustering Nube (Robot Odometrico)')
+hold on, grid on
+gscatter(nubePtos_2(:,1),nubePtos_2(:,2),idx_2);
+plot( caractM_2(:,1) , caractM_2(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
 
 
-% M
-caractM = puntoMedioPoste;
-cantM = length(caractM(:,1));
-CP = cell(cantM,1);
+%% Pregunta 3 Localizacion (caracteritstias mapa conocidas)
 
-for i=1:cantM
-    eX = abs(errorCoordenada(i, 1));
-    eY = abs(errorCoordenada(i, 2));
-    CP{i} = [eX 0; 0 eY];
-end
 
-% largoGrupos = length(unique(idx))-1;
-% covNP= cell(cantM,1);
-% for i=1:cantM
-%     vX = var(nubePtos( idx==i , 1));
-%     vY = var(nubePtos( idx==i , 2));
-%     covNP{i} = [vX 0; 0 vY];
-% end
 
-covNP = [var(nubePtos(:, 1)) 0 ; 0 var(nubePtos(:, 2))];
 
 %% Postes Globales
 figure
 title('Deteccion de Postes Eje global')
 hold on, grid on
 plot(M(:,1), M(:,2), 'ob')                                  % Postes verdaderos
-plot(nubePtos(:,1), nubePtos(:,2),'.r')                     % Nube de datos LiDar
+plot(nubePtos_1(:,1), nubePtos_1(:,2),'.r')                     % Nube de datos LiDar
 plot(Vertices(:,1), Vertices(:,2), '.k', 'MarkerSize', 15)  % Vertices verdaderos
-plot( puntoMedioPoste(:,1) , puntoMedioPoste(:,2) ,'.g','MarkerSize', 25)           % Postes estimados
-plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')            % Vertices estimados
+plot( caractM_1(:,1) , caractM_1(:,2) ,'.g','MarkerSize', 25)           % Postes estimados
 
 
 
