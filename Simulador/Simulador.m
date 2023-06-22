@@ -154,7 +154,27 @@ plot( caractM_2(:,1) , caractM_2(:,2) ,'.k','MarkerSize', 25)   % caracteristica
 %% Pregunta 3 Localizacion (caracteritstias mapa conocidas)
 
 
+function p = peo(x0,y0,t0, CP)
+    % Matrices de traslacion y rotacion global
+    T = @(tx,ty) [1 0 tx; 0 1 ty; 0 0 1];
+    R = @(tita) [cos(tita) -sin(tita); sin(tita) cos(tita)];
+    
+    CPg = zeros(length(M(:,1),2));
+    for i=1:lenth(CPg(:,1))
+        newCord = R(t0) * [M(i,1);M(i,2)];
+        newCord = T(x0, y0) * [newCord; 1]; 
+        CPg(i,:) = newCord(1:2);
+    end
+    
 
+    
+    M = zeros(2,181);
+    M(1,:) = 10;
+    M(2,:) = 0:1:180;
+
+    
+    
+end
 
 %% Postes Globales
 figure
