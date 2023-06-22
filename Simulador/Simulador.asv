@@ -66,18 +66,19 @@ for cont = 2:length(xx)-1
     
     % ###########################   
     %Sensado de Postes (LASER)
-    Laser = MedicionConLaserRapido(Vertices, Caras, robot2);    % Laser con robot2
+    Laser = MedicionConLaserRapido(Vertices, Caras, robot2);    % Laser con robot original (robot2)
     H3 = plotLaser(Laser,robot2);
     
-    % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico sin error
+    % Deteccion de Postes (NUBE DE PUNTOS) Robot real
     BuscoPostes_1 = [];
-    BuscoPostes_1 = DeteccionPostes(Laser,robot);         
+    BuscoPostes_1 = DeteccionPostes(Laser,robot2);         % asignar el robot correspondiente
     nubePtos_1 = [nubePtos_1 ; BuscoPostes_1];
     
-    % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico con error
+    % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico
     BuscoPostes_2 = [];
-    BuscoPostes_2 = DeteccionPostes(Laser,robot2);         
+    BuscoPostes_2 = DeteccionPostes(Laser,robot);         % asignar el robot correspondiente
     nubePtos_2 = [nubePtos_2 ; BuscoPostes_2];
+    
     
     % ########################### 
     
@@ -110,12 +111,12 @@ for cont = 2:length(xx)-1
     W = Control(2);     % input u(t)
     
     %####### MODELOS DEL SISTEMA ##########%
-    % Posicion del robot odometrico sin error
+    % Posicion del robot odometrico 
     robot.x = robot.x + pasoTiempo*V*cos(robot.tita);
     robot.y = robot.y + pasoTiempo*V*sin(robot.tita);
     robot.tita = robot.tita + pasoTiempo*W;
     
-    % Posicion del robot odometrico con error
+    % Posicion del robot real 
     robot2.x = robot2.x + pasoTiempo*V*cos(robot2.tita)+0.001*rand(1,1);
     robot2.y = robot2.y + pasoTiempo*V*sin(robot2.tita)+0.001*rand(1,1);
     robot2.tita = robot2.tita + pasoTiempo*W+0.01*rand(1,1)*W;
@@ -129,7 +130,7 @@ for cont = 2:length(xx)-1
     delete(H3);
 end
 
-%% Pregunta 1 Robot Odometrico sin error
+%% Pregunta 1 Robot real
 % Obtencion de Caracteristica M y su covarianza
 [caractM_1, cov_caractM_1, error_caractM_1, label_caractM_1, idx_1] = ClusteringNube(nubePtos_1, M);
 
@@ -139,7 +140,7 @@ hold on, grid on
 gscatter(nubePtos_1(:,1),nubePtos_1(:,2),idx_1);
 plot( caractM_1(:,1) , caractM_1(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
 
-%% Pregunta 2 Robot Odometrico con error
+%% Pregunta 2 Robot Odometrico
 % idem anterior cambiando la deteccionPostes a robot 1 en Linea 79 codigo.
 % Obtencion de Caracteristica M y su covarianza
 [caractM_2, cov_caractM_2, error_caractM_2, label_caractM_2, idx_2] = ClusteringNube(nubePtos_2, M);
