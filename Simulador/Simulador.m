@@ -79,6 +79,8 @@ for cont = 2:length(xx)-1
     BuscoPostes_2 = DeteccionPostes(Laser,robot2);         
     nubePtos_2 = [nubePtos_2 ; BuscoPostes_2];
     
+%     z = observation(M, robot2);
+    
     % ########################### 
     
     %referencias para el controlador (obviar esta parte) y obtenci�n de las
@@ -129,15 +131,28 @@ for cont = 2:length(xx)-1
     delete(H3);
 end
 
+Datos.pasoTiempo = pasoTiempo;
+Datos.Laser = Laser;
+Datos.robot = robot;
+Datos.postes = M;
+Datos.nubePtos = nubePtos_1;
+save('Datos','Datos')
+
+
 %% Pregunta 1 Robot Odometrico sin error
 % Obtencion de Caracteristica M y su covarianza
 [caractM_1, cov_caractM_1, error_caractM_1, label_caractM_1, idx_1] = ClusteringNube(nubePtos_1, M);
 
 figure()
-title('Clustering Nube (Robot Real)')
+title('Clustering Nube (Robot Odometrico sin error)')
 hold on, grid on
 gscatter(nubePtos_1(:,1),nubePtos_1(:,2),idx_1);
 plot( caractM_1(:,1) , caractM_1(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
+
+
+z = observation(caractM_1, robot2);
+
+
 
 %% Pregunta 2 Robot Odometrico con error
 % idem anterior cambiando la deteccionPostes a robot 1 en Linea 79 codigo.
@@ -145,7 +160,7 @@ plot( caractM_1(:,1) , caractM_1(:,2) ,'.k','MarkerSize', 25)   % caracteristica
 [caractM_2, cov_caractM_2, error_caractM_2, label_caractM_2, idx_2] = ClusteringNube(nubePtos_2, M);
 
 figure()
-title('Clustering Nube (Robot Odometrico)')
+title('Clustering Nube (Robot Odometrico con error)')
 hold on, grid on
 gscatter(nubePtos_2(:,1),nubePtos_2(:,2),idx_2);
 plot( caractM_2(:,1) , caractM_2(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
@@ -154,36 +169,17 @@ plot( caractM_2(:,1) , caractM_2(:,2) ,'.k','MarkerSize', 25)   % caracteristica
 %% Pregunta 3 Localizacion (caracteritstias mapa conocidas)
 
 
-function p = peo(x0,y0,t0, CP)
-    % Matrices de traslacion y rotacion global
-    T = @(tx,ty) [1 0 tx; 0 1 ty; 0 0 1];
-    R = @(tita) [cos(tita) -sin(tita); sin(tita) cos(tita)];
-    
-    CPg = zeros(length(M(:,1),2));
-    for i=1:lenth(CPg(:,1))
-        newCord = R(t0) * [M(i,1);M(i,2)];
-        newCord = T(x0, y0) * [newCord; 1]; 
-        CPg(i,:) = newCord(1:2);
-    end
-    
 
-    
-    M = zeros(2,181);
-    M(1,:) = 10;
-    M(2,:) = 0:1:180;
 
-    
-    
-end
 
 %% Postes Globales
-figure
-title('Deteccion de Postes Eje global')
-hold on, grid on
-plot(M(:,1), M(:,2), 'ob')                                  % Postes verdaderos
-plot(nubePtos_1(:,1), nubePtos_1(:,2),'.r')                     % Nube de datos LiDar
-plot(Vertices(:,1), Vertices(:,2), '.k', 'MarkerSize', 15)  % Vertices verdaderos
-plot( caractM_1(:,1) , caractM_1(:,2) ,'.g','MarkerSize', 25)           % Postes estimados
+% figure
+% title('Deteccion de Postes Eje global')
+% hold on, grid on
+% plot(M(:,1), M(:,2), 'ob')                                  % Postes verdaderos
+% plot(nubePtos_1(:,1), nubePtos_1(:,2),'.r')                     % Nube de datos LiDar
+% plot(Vertices(:,1), Vertices(:,2), '.k', 'MarkerSize', 15)  % Vertices verdaderos
+% plot( caractM_1(:,1) , caractM_1(:,2) ,'.g','MarkerSize', 25)           % Postes estimados
 
 
 
