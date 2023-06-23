@@ -86,7 +86,7 @@ end
 % "x" para que las dimensiones calzen en la actualizacion del kalman, se
 % puso un reshape en la innovacion "y"
 
-
+% Cambiar H por el jacobiano de z (esta en la PPT)
 
 
 

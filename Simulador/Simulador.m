@@ -59,6 +59,17 @@ H2 = plotRobot2(robot2);    % Robot odometrico (con ruido)
 nubePtos_1 = [];
 nubePtos_2 = [];
 
+%#########################################%
+%## INICIALIZAR VARIABLES FILTRO KALMAN ##%
+%#########################################%
+
+
+
+
+% ######################################## %
+
+
+
 % Genero un bucle para controlar el camino del robot
 for cont = 2:length(xx)-1
     delete(H1);
@@ -72,7 +83,8 @@ for cont = 2:length(xx)-1
     % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico sin error
     BuscoPostes_1 = [];
     BuscoPostes_1 = DeteccionPostes(Laser,robot);         
-    nubePtos_1 = [nubePtos_1 ; BuscoPostes_1];
+%     nubePtos_1 = [nubePtos_1 ; BuscoPostes_1];
+    nubePtos_1 = [BuscoPostes_1];
     
     % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico con error
     BuscoPostes_2 = [];
@@ -141,7 +153,7 @@ save('Datos','Datos')
 
 %% Pregunta 1 Robot Odometrico sin error
 % Obtencion de Caracteristica M y su covarianza
-[caractM_1, cov_caractM_1, error_caractM_1, label_caractM_1, idx_1] = ClusteringNube(nubePtos_1, M);
+[caractM_1, cov_caractM_1, error_caractM_1, label_caractM_1, idx_1] = ClusteringNube(nubePtos_1, M, 0.1, 4);
 
 figure()
 title('Clustering Nube (Robot Odometrico sin error)')
@@ -150,14 +162,14 @@ gscatter(nubePtos_1(:,1),nubePtos_1(:,2),idx_1);
 plot( caractM_1(:,1) , caractM_1(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
 
 
-z = observation(caractM_1, robot2);
+% z = observation(caractM_1, robot2);
 
 
 
 %% Pregunta 2 Robot Odometrico con error
 % idem anterior cambiando la deteccionPostes a robot 1 en Linea 79 codigo.
 % Obtencion de Caracteristica M y su covarianza
-[caractM_2, cov_caractM_2, error_caractM_2, label_caractM_2, idx_2] = ClusteringNube(nubePtos_2, M);
+[caractM_2, cov_caractM_2, error_caractM_2, label_caractM_2, idx_2] = ClusteringNube(nubePtos_2, M, 0.1, 4);
 
 figure()
 title('Clustering Nube (Robot Odometrico con error)')

@@ -1,6 +1,6 @@
-function [PMi, covNP, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M)
+function [PMi, covNP, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M, distCluster, cantCluster)
     % Clustering postes Global total
-    [idx, ~] = dbscan(nubePtos, 0.1, 4);  % (data, dist entre Vecinos, n�Min de Vecinos para formar grupo)
+    [idx, ~] = dbscan(nubePtos, distCluster, cantCluster);  % (data, dist max entre Vecinos, n�Min de Vecinos para formar grupo)
 
     % Largo de Clustering (si hay ruido del cluster (-1), no lo considera)
     if idx(idx <0)
