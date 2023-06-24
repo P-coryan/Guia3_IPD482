@@ -73,7 +73,7 @@ function [PMi, covNP, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M, distC
     
 %         plot(pGi(:,1), pGi(:,2) , '.-b','MarkerSize', 25)     % puntos mas extensos
 %         plot( PMi(i,1) , PMi(i,2) ,'.k','MarkerSize', 25)     % punto medio estimado
-%         plot(iVerticesPlot(:,1), iVerticesPlot(:,2),'k')
+%         plot(iVertices(:,1), iVertices(:,2),'k')
     
     end
 end

@@ -59,16 +59,6 @@ H2 = plotRobot2(robot2);    % Robot odometrico (con ruido)
 nubePtos_1 = [];
 nubePtos_2 = [];
 
-%#########################################%
-%## INICIALIZAR VARIABLES FILTRO KALMAN ##%
-%#########################################%
-
-
-
-
-% ######################################## %
-
-
 
 % Genero un bucle para controlar el camino del robot
 for cont = 2:length(xx)-1
@@ -83,17 +73,26 @@ for cont = 2:length(xx)-1
     % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico sin error
     BuscoPostes_1 = [];
     BuscoPostes_1 = DeteccionPostes(Laser,robot);         
-%     nubePtos_1 = [nubePtos_1 ; BuscoPostes_1];
-    nubePtos_1 = [BuscoPostes_1];
+    nubePtos_1 = [nubePtos_1 ; BuscoPostes_1];
     
     % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico con error
     BuscoPostes_2 = [];
     BuscoPostes_2 = DeteccionPostes(Laser,robot2);         
     nubePtos_2 = [nubePtos_2 ; BuscoPostes_2];
-    
-%     z = observation(M, robot2);
-    
+      
     % ########################### 
+    
+    %#########################################%
+    %## FILTRO KALMAN (ESTIMACION POSE ROBOT)##%
+    %#########################################%
+    if cont == 2 
+        [xhat, P] = init_KalmanFilter(Laser, robot, M, cont);   % inicializacion Kalman Filter
+    else
+        [xhat, P] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, pasoTiempo, cont, M);
+    end
+    % ######################################## %
+
+    
     
     %referencias para el controlador (obviar esta parte) y obtenci�n de las
     %se�ales de control
@@ -143,12 +142,13 @@ for cont = 2:length(xx)-1
     delete(H3);
 end
 
-Datos.pasoTiempo = pasoTiempo;
-Datos.Laser = Laser;
-Datos.robot = robot;
-Datos.postes = M;
-Datos.nubePtos = nubePtos_1;
-save('Datos','Datos')
+% Datos.pasoTiempo = pasoTiempo;
+% Datos.Laser = Laser;
+% Datos.robot = robot;
+% Datos.postes = M;
+% Datos.nubePtos = nubePtos_1;
+% save('Datos','Datos')
+
 
 
 %% Pregunta 1 Robot Odometrico sin error
@@ -160,10 +160,6 @@ title('Clustering Nube (Robot Odometrico sin error)')
 hold on, grid on
 gscatter(nubePtos_1(:,1),nubePtos_1(:,2),idx_1);
 plot( caractM_1(:,1) , caractM_1(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
-
-
-% z = observation(caractM_1, robot2);
-
 
 
 %% Pregunta 2 Robot Odometrico con error
@@ -181,6 +177,26 @@ plot( caractM_2(:,1) , caractM_2(:,2) ,'.k','MarkerSize', 25)   % caracteristica
 %% Pregunta 3 Localizacion (caracteritstias mapa conocidas)
 
 
+
+
+
+% SOLO PARA QUE VEA 1 POSTE
+function [xhat, P] = init_KalmanFilter(Laser, robot, M, k) %robot_hat
+% Procesamiento de los datos (get_measurements)
+nubePtos = DeteccionPostes(Laser,robot);    % eje global
+[caract, cov_caract, ~, ~, ~] = ClusteringNube(nubePtos, M, 0.2, 3); % eje global
+    % considerar agregar un reshape a caract para mas analizar postes
+
+% Condicion Inicial Kalman Filter (xhat(0/0))    
+% Vector estado inicial
+% xhat = zeros( 3+length(caract) ,k);
+xhat = zeros( 3+length(M) ,k);
+% xhat(:,k) = [robot.x ; robot.y ; robot.tita ; caract(1) ; caract(2)];
+xhat(:,k) = [robot.x ; robot.y ; robot.tita ; M'];
+% P = diag( [ ones(1,2), 0.1, ones(1,length(caract))] );
+P = diag( [ ones(1,2), 0.1, ones(1,length(M))] );
+
+end
 
 
 
