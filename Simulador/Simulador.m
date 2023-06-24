@@ -78,24 +78,23 @@ for cont = 2:length(xx)-1
     BuscoPostes_2 = [];
     BuscoPostes_2 = DeteccionPostes(Laser,robot2);         
     nubePtos_2 = [nubePtos_2 ; BuscoPostes_2];
-      
-    % ########################### 
+
     
-    %#########################################%
+    %##########################################%
     %## FILTRO KALMAN (ESTIMACION POSE ROBOT)##%
-    %#########################################%
+    %##########################################%
     if cont == 2 
-        [xhat, P] = init_KalmanFilter(Laser, robot, M);   % inicializacion Kalman Filter
+        [xhat, P] = init_KalmanFilter(Laser, robot, M);   
     else
         [xhat, P, threshold] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, pasoTiempo, cont, M, threshold, robot);
     end
     robot_hat.x = xhat(1,cont);
     robot_hat.y = xhat(2,cont);
     robot_hat.tita = xhat(3,cont);
-    % ######################################## %
     
     
     
+    %####### SEÑALES DE CONTROL u(t) DEL SISTEMA ##########%
     %referencias para el controlador (obviar esta parte) y obtenci�n de las
     %se�ales de control
     Q = .01*eye(3,3);
@@ -138,7 +137,7 @@ for cont = 2:length(xx)-1
     %####### GRAFICAS ROBOTS ##########%
     H1=plotRobot(robot);        % (gris)
     H2=plotRobot2(robot2);      % (verde)
-    H4=plotRobot_hat(robot_hat);
+    H4=plotRobot_hat(robot_hat);% (rojo)
    
 %     pause(pasoTiempo);
     pause(1e-4);

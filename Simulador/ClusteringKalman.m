@@ -9,14 +9,13 @@ function [PMi, covNP, posteYgrupo, idx] = ClusteringKalman(nubePtos, distCluster
         largoGrupos = length(unique(idx));
     end
     
-    % Analisis punto medio por grupo y clasificacion
+    % Analisis promedio por grupo
     PMi = zeros(largoGrupos, 2);
     posteYgrupo = zeros(largoGrupos, 1);
     
     % Inicializacion Covarianza de postes 
     covNP= cell(largoGrupos,1);
     
-   
     for i = 1:largoGrupos
         % Separacion por grupo
         iGrupo = nubePtos(idx == i, :);

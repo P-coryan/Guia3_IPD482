@@ -3,8 +3,9 @@
 % SOLO PARA QUE VEA 1 POSTE
 function [xhat, P, threshold] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, tau, k, M, threshold, robot) %robot_hat
     
-    [dHx, h_k, g, J1, J2] = matrixData();
-    %%% Prediccion
+    [h_k, dHx, g, dGz, dYxz, J1, J2] = matrixFunctions();
+    
+    %%% Prediccion Kalman
     xhat(1,k) = xhat(1,k-1) + tau*V*cos(xhat(3,k-1));
     xhat(2,k) = xhat(2,k-1) + tau*V*sin(xhat(3,k-1));
     xhat(3,k) = xhat(3,k-1) + tau*W;
@@ -24,7 +25,7 @@ function [xhat, P, threshold] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, t
     
     %%% Medicion del tiempo k
     nubePtos = DeteccionPostes(Laser,robot_hat);    %coord global
-    [z_k, R_k, ~, ~] = ClusteringKalman(nubePtos, 0.2, 3); 
+    [z_k, R_k, ~, ~] = ClusteringKalman(nubePtos, 0.2, 3);  %coord global
     posteMed_G = z_k;                               %coord global
     z_k = h_k(z_k,robot_hat);                       %coord local
     %%% Estimacion Medicion del tiempo k
@@ -39,7 +40,7 @@ function [xhat, P, threshold] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, t
 %         H_k = [  zeros(2)   , zeros(2,3)]; 
 %     end
     
-    %%% Actualizacion
+    %%% Actualizacion Kalman
     S_k = H_k*P*H_k' + R_k{1};
     K_k = P*H_k'/S_k;
     P = (eye(length(P)) - K_k*H_k)*P;
@@ -52,23 +53,4 @@ function [xhat, P, threshold] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, t
  
 
 end
-
-% % SOLO PARA QUE VEA 1 POSTE
-% function [xhat, P] = init_KalmanFilter(Laser, robot, M, k) %robot_hat
-% % Procesamiento de los datos (get_measurements)
-% nubePtos = DeteccionPostes(Laser,robot);    % eje global
-% [caract, cov_caract, ~, ~, ~] = ClusteringNube(nubePtos, M, 0.2, 3); % eje global
-%     % considerar agregar un reshape a caract para mas analizar postes
-% 
-% % Condicion Inicial Kalman Filter (xhat(0/0))    
-% % Vector estado inicial
-% xhat = zeros( 3+length(caract) ,k);
-% xhat(:,k) = [robot.x ; robot.y ; robot.tita ; caract(1) ; caract(2)];
-% P = diag( [ ones(1,2), 0.1, ones(1,length(caract))] );
-% 
-% end
-
-
-
-
 
