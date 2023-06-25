@@ -4,11 +4,12 @@ close all,
 
 set(figure(),'WindowStyle','docked') % Insert the figure to dock
 figure(1), hold on
-title('"Trayectoria robot estimada, caracteristicas M conocidas"')
-xlim([-5 10]);
-ylim([-10 10]);
+title('Trayectoria estimada, caracteristicas conocidas')
 
+xlim([-5 10]);
+ylim([-5 10]);
 global maxRange;
+
 maxRange = 10; %Distancia m�xima del laser
 % axis equal
 

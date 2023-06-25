@@ -33,10 +33,9 @@ function [xhat, P] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, tau, k) %rob
     end
     
     %%% Estimacion salida del tiempo k
-    zhat_k = zeros(2*n,1);
+    zhat_k = zeros(length(z_k),1);
     postePredict_G = zeros(n,2);
     for t = 1:n
-        zhat_k(((1:2)+2*(t-1)),1) = h_k([xhat((4+2*(t-1)),k), xhat((5+2*(t-1)),k)], robot_hat); %coord local
         postePredict_G(t,:) = [xhat((4+2*(t-1)),k), xhat((5+2*(t-1)),k)];                       %coord global
     end
     
@@ -54,7 +53,7 @@ function [xhat, P] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, tau, k) %rob
                 
                 H_k((2*(i-1)+1):(2*(i-1)+2), (2*(t-1)+4):(2*(t-1)+5)) = dH_xfn(posteMed_G(i,1) , posteMed_G(i,2), robot_hat);    % 2x2
 
-                R_k((2*(t-1)+1):(2*(t-1)+2), (2*(t-1)+1):(2*(t-1)+2))= covMed{i};
+                R_k((2*(i-1)+1):(2*(i-1)+2), (2*(i-1)+1):(2*(i-1)+2))= covMed{i};
                 
                 zhatFinal_ordenado((2*(i-1)+1):(2*(i-1)+2)) = h_k([xhat((4+2*(t-1)),k), xhat((5+2*(t-1)),k)], robot_hat);
                 

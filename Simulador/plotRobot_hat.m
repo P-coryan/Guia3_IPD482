@@ -1,4 +1,4 @@
-function [graph_robot,Vertices, Caras] = plotRobot(robot)
+function [graph_robot,Vertices, Caras] = plotRobot_hat(robot)
 
 X = robot.x;
 Y = robot.y;
