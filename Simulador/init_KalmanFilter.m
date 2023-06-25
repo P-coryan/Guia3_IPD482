@@ -14,6 +14,6 @@ function [xhat, P] = init_KalmanFilter(Laser, robot, M) %robot_hat
     % Condicion Inicial Kalman Filter (xhat(0/0)) Vector estado inicial 
     xhat = zeros( 3+length(M) ,2);
     xhat(:,2) = [robot.x ; robot.y ; robot.tita ; M];
-    P = diag( [ ones(1,2), 0.1, zeros(1,length(M))] );
+    P = diag( [ ones(1,2), 0.1, 0.0001*ones(1,length(M))] );
 
 end

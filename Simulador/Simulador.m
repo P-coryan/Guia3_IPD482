@@ -58,7 +58,7 @@ H2 = plotRobot2(robot2);    % Robot odometrico (con ruido)
 % Inicializacion Nube de Puntos Global
 nubePtos_1 = [];
 nubePtos_2 = [];
-threshold = 0;
+
 % Genero un bucle para controlar el camino del robot
 for cont = 2:length(xx)-1
     delete(H1);
@@ -86,7 +86,7 @@ for cont = 2:length(xx)-1
     if cont == 2 
         [xhat, P] = init_KalmanFilter(Laser, robot, M);   
     else
-        [xhat, P, threshold] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, pasoTiempo, cont, M, threshold, robot);
+        [xhat, P] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, pasoTiempo, cont);
     end
     robot_hat.x = xhat(1,cont);
     robot_hat.y = xhat(2,cont);
@@ -138,6 +138,7 @@ for cont = 2:length(xx)-1
     H1=plotRobot(robot);        % (gris)
     H2=plotRobot2(robot2);      % (verde)
     H4=plotRobot_hat(robot_hat);% (rojo)
+    H5=plotLaser_hat(Laser,robot_hat);  %(Laser hat Blue de linea continua)
    
 %     pause(pasoTiempo);
     pause(1e-4);
@@ -146,6 +147,7 @@ for cont = 2:length(xx)-1
     delete(H2);
     delete(H3);
     delete(H4);
+    delete(H5);
 end
 
 % Datos.pasoTiempo = pasoTiempo;

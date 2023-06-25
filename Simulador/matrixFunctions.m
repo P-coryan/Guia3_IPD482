@@ -1,12 +1,16 @@
 
-function [h, dHx, g, dGz, dYxz, J1, J2] = matrixFunctions()
+function [h, dH_xv, dH_xfn, g, dGz, dYxz, J1, J2] = matrixFunctions()
     % Transforma caracteristica global a local
     h = @(caract,robot) [ sqrt((caract(1,1)-robot.x)^2 + (caract(1,2)-robot.y)^2) ;
-            rad2deg( atan2((caract(1,2)-robot.y),(caract(1,1)-robot.x)) -robot.tita +pi/2)]; %-robot.tita +pi/2  rad2deg
+            ( atan2((caract(1,2)-robot.y),(caract(1,1)-robot.x)) -robot.tita +pi/2)]; %-robot.tita +pi/2  rad2deg
 
-    dHx = @(xi,yi,r,robot) [  (xi-robot.x)/r , (yi-robot.y)/r , 0 ;
-                 (yi-robot.y)/r^2 , -(xi-robot.x)/r^2 , -1  ];
+    dH_xv = @(xi,yi,robot) [  -(xi-robot.x)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2) , -(yi-robot.y)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2) , 0 ;
+                            (yi-robot.y)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2)^2 , -(xi-robot.x)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2)^2 , -1  ];
         
+    dH_xfn = @(xi,yi,robot) [ (xi-robot.x)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2) , (yi-robot.y)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2) ;
+                            -(yi-robot.y)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2)^2 , (xi-robot.x)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2)^2];         
+                                  
+                        
     g = @(r,tita,robot) [robot.x+r*cos(tita+robot.tita) ; 
                         robot.y+r*sin(tita+robot.tita)];
 
