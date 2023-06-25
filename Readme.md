@@ -13,6 +13,6 @@ El filtro se basa en dos ecuaciones clave:
 
 ## Simulación de Prueba
 
-A continuación se muestra una simulación que soluciona la pregunta. En esta simulación, inicializamos la matriz de covarianza P con el vector P = diag( [ ones(1,2), 0.1, zeros(1,length(M))] ); La matriz de covarianza se utiliza para expresar nuestras incertidumbres sobre la estimación del estado.
+A continuación se muestra una simulación que soluciona la pregunta. En esta simulación, inicializamos la matriz de covarianza P con el vector P = diag( [ ones(1,2), 0.1, zeros(1,length(M))] ); La matriz de covarianza se utiliza para expresar nuestras incertidumbres sobre la estimación del estado  y el vector estado representa la pose  del robot  y las caracteriticas puntuales del mapa,  se inicializa como xhat = zeros( 3+length(M) ,2);  para su dimensión y los datos son xhat(:,2) = [robot.x ; robot.y ; robot.tita ; M];    .
 
 ![Simulación Robot](p3.gif)
