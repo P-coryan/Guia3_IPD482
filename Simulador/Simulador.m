@@ -1,10 +1,15 @@
 clear,
 clc,
 close all,
+% %Load camino guardado en path
+% load('DataMap.mat')
+% M = DataMap.M;
+% X = DataMap.X;
+% Y = DataMap.Y;
 
 set(figure(),'WindowStyle','docked') % Insert the figure to dock
 figure(1), hold on
-title('"Trayectoria robot estimada, caracteristicas M conocidas"')
+title('"Trayectoria robot estimada"')
 xlim([-5 10]);
 ylim([-10 10]);
 
@@ -41,6 +46,12 @@ yy = interp1(X,Y,xx,'spline');
 CaminoReferencia = [xx' yy'];
 plot(xx',yy','-r');
 
+%% Save camino
+% DataMap.M = M;
+% DataMap.X = X;
+% DataMap.Y = Y;
+% save('DataMap','DataMap')
+
 %%
 %Inicializo Robots en el punto de partida del camino generado
 % Robot Odometrico sin ruido:
@@ -58,15 +69,17 @@ H2 = plotRobot2(robot2);    % Robot odometrico (con ruido) (verde)
 % Inicializacion Nube de Puntos Global
 nubePtos_1 = [];
 nubePtos_2 = [];
+    
+pause(0.5)
+delete(H1);
+delete(H2);
 
 % Genero un bucle para controlar el camino del robot
 for cont = 2:length(xx)-1
-    delete(H1);
-    delete(H2);
-    
+
     % ###########################   
-    %Sensado de Postes (LASER)
-    Laser = MedicionConLaserRapido(Vertices, Caras, robot2);    % Laser con robot2
+    %Sensado de Postes (LASER)  con robot2
+    Laser = MedicionConLaserRapido(Vertices, Caras, robot2);    
 %     H3 = plotLaser(Laser,robot2);
     
     % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico sin error
@@ -79,19 +92,20 @@ for cont = 2:length(xx)-1
     BuscoPostes_2 = DeteccionPostes(Laser,robot2);         
     nubePtos_2 = [nubePtos_2 ; BuscoPostes_2];
 
-    
     %##########################################%
     %## FILTRO KALMAN (ESTIMACION POSE ROBOT)##%
     %##########################################%
+    % (1== SI conocemos las caract)(0== NO conocemos las caract)
+    knowMap = 0;
     if cont == 2 
-        [xhat, P] = init_KalmanFilter(Laser, robot, M);   
+        [xhat, P] = init_KalmanFilter(Laser, robot, M, knowMap);    
     else
-        [xhat, P] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, pasoTiempo, cont);
+        % [xhat, P] = FiltroKalman_version1(Laser ,xhat ,P , V, W, pasoTiempo, cont);
+        [xhat, P] = FiltroKalman_Odometric(Laser ,xhat ,P , V, W, pasoTiempo, cont, knowMap);
     end
     robot_hat.x = xhat(1,cont);
     robot_hat.y = xhat(2,cont);
     robot_hat.tita = xhat(3,cont);
-    
     
     
     %####### SEÑALES DE CONTROL u(t) DEL SISTEMA ##########%
@@ -135,29 +149,21 @@ for cont = 2:length(xx)-1
     robot2.tita = robot2.tita + pasoTiempo*W+0.01*rand(1,1)*W;
     
     %####### GRAFICAS ROBOTS ##########%
+    H1=plotRobot(robot);            % robot sin ruido(gris)
+    H2=plotRobot2(robot2);          % robot ruidoso (verde)
     H3 = plotLaser(Laser,robot2);   % Laser
-    H1=plotRobot(robot);        % robot sin ruido(gris)
-    H2=plotRobot2(robot2);      % robot ruidoso (verde)
-    H4=plotRobot_hat(robot_hat);% (rojo)
-%     H5=plotLaser_hat(Laser,robot_hat);  %(Laser hat Blue de linea continua)
+    H4=plotRobot_hat(robot_hat);    % (rojo)
+%     H5=plotLaser_hat(Laser,robot_hat);  %(Laser_hat Blue de linea continua)
    
-%     legend('caracteristicas', 'trayectoria', 'Laser', 'robot sin ruido ', 'robot ruidoso', 'robot estimado')
 %     pause(pasoTiempo);
-    pause(1e-4);
+    pause(1e-5);
     
     delete(H1);
     delete(H2);
     delete(H3);
     delete(H4);
-    delete(H5);
+%     delete(H5);
 end
-
-% Datos.pasoTiempo = pasoTiempo;
-% Datos.Laser = Laser;
-% Datos.robot = robot;
-% Datos.postes = M;
-% Datos.nubePtos = nubePtos_1;
-% save('Datos','Datos')
 
 
 
@@ -184,21 +190,44 @@ gscatter(nubePtos_2(:,1),nubePtos_2(:,2),idx_2);
 plot( caractM_2(:,1) , caractM_2(:,2) ,'.k','MarkerSize', 25)   % caracteristica M estimada
 
 
-%% Pregunta 3 Localizacion (caracteritstias mapa conocidas)
+%% Pregunta 3 y 4
 
+% comparacion puntos con los estimados
+caract_hatFinal = xhat(4:end,end);
+for t = 1:length(caract_hatFinal)/2
+    index = 2*(t-1) + 1;
+    plot_caractHat(t,:) = [caract_hatFinal(index),caract_hatFinal(index+1)];
+end
 
+figure()
+subplot 221 
+title('Caracteristicas con robot 1') 
+hold on
+plot(M(:,1),M(:,2),'ob', 'MarkerSize',15); %grafico landmarks
+plot( plot_caractHat(:,1), plot_caractHat(:,2), '.r'  , 'MarkerSize', 15, 'DisplayName', 'estimacion')
+plot(nubePtos_1(:,1), nubePtos_1(:,2),'.g')
+legend('caracteristicas', 'estimacion EKF', 'nube de puntos recopilada')
 
+subplot 222
+title('Caracteristicas con robot 2') 
+hold on
+plot(M(:,1),M(:,2),'ob', 'MarkerSize',15); %grafico landmarks
+plot( plot_caractHat(:,1), plot_caractHat(:,2), '.r'  , 'MarkerSize', 15, 'DisplayName', 'estimacion')
+plot(nubePtos_2(:,1), nubePtos_2(:,2),'.g')
+legend('caracteristicas', 'estimacion EKF', 'nube de puntos recopilada')
 
+subplot 223
+title('Procesamiento Nube de puntos (robot 1)') 
+hold on
+plot(M(:,1),M(:,2),'ob', 'MarkerSize',15); %grafico landmarks
+plot( caractM_1(:,1) , caractM_1(:,2) ,'.g','MarkerSize', 20)           % Postes estimados
+legend('caracteristicas', 'clustering Nube de puntos')
 
-
-%% Postes Globales
-% figure
-% title('Deteccion de Postes Eje global')
-% hold on, grid on
-% plot(M(:,1), M(:,2), 'ob')                                  % Postes verdaderos
-% plot(nubePtos_1(:,1), nubePtos_1(:,2),'.r')                     % Nube de datos LiDar
-% plot(Vertices(:,1), Vertices(:,2), '.k', 'MarkerSize', 15)  % Vertices verdaderos
-% plot( caractM_1(:,1) , caractM_1(:,2) ,'.g','MarkerSize', 25)           % Postes estimados
-
+subplot 224
+title('Procesamiento Nube de puntos (robot 2)')
+hold on
+plot(M(:,1),M(:,2),'ob', 'MarkerSize',15); %grafico landmarks
+plot( caractM_2(:,1) , caractM_2(:,2) ,'.g','MarkerSize', 20)           % Postes estimados
+legend('caracteristicas', 'clustering Nube de puntos')
 
 

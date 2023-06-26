@@ -1,7 +1,7 @@
                 
 
-% SOLO PARA QUE VEA 1 POSTE
-function [xhat, P] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, tau, k) %robot_hat
+
+function [xhat, P] = FiltroKalman_version1(Laser ,xhat ,P , V, W, tau, k) %robot_hat
     
     [h_k, dH_xv, dH_xfn, g, dGz, dYxz, J1, J2] = matrixFunctions();
     
@@ -26,7 +26,7 @@ function [xhat, P] = FiltroKalman_Odometrico(Laser ,xhat ,P , V, W, tau, k) %rob
     
     %%% Medicion del tiempo k
     nubePtos = DeteccionPostes(Laser,robot_hat);                        %coord global
-    [posteMed_G, covMed, ~, ~] = ClusteringKalman(nubePtos, 0.2, 3);    %coord global                           
+    [posteMed_G, covMed, ~, ~] = ClusteringKalman(nubePtos, 0.2, 2);    %coord global                           
     z_k = zeros(2*length(posteMed_G(:,1)),1);       
     for t = 1:length(posteMed_G(:,1))
         z_k(((1:2)+2*(t-1)),1) = h_k([posteMed_G(t,1), posteMed_G(t,2)]  ,robot_hat); %coord local

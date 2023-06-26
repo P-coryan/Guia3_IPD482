@@ -11,8 +11,8 @@ function [h, dH_xv, dH_xfn, g, dGz, dYxz, J1, J2] = matrixFunctions()
                             -(yi-robot.y)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2)^2 , (xi-robot.x)/sqrt((xi-robot.x)^2 + (yi-robot.y)^2)^2];         
                                   
                         
-    g = @(r,tita,robot) [robot.x+r*cos(tita+robot.tita) ; 
-                        robot.y+r*sin(tita+robot.tita)];
+    g = @(r,tita,robot) [robot.x+r*cos(tita+robot.tita -pi/2) ; 
+                        robot.y+r*sin(tita+robot.tita -pi/2)];
 
     dGz = @(r,tita) [cos(tita + robot.tita) , -r*sen(tita+robot.tita)  ; 
             sin(tita + robot.tita) ,  r*cos(tita+robot.tita) ];
