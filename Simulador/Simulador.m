@@ -1,11 +1,11 @@
 clear,
 clc,
 close all,
-% %Load camino guardado en path
-% load('DataMap.mat')
-% M = DataMap.M;
-% X = DataMap.X;
-% Y = DataMap.Y;
+%Load camino guardado en path
+load('DataMap.mat')
+M = DataMap.M;
+X = DataMap.X;
+Y = DataMap.Y;
 
 set(figure(),'WindowStyle','docked') % Insert the figure to dock
 figure(1), hold on
@@ -30,13 +30,13 @@ robot2 = robot; %es el robot odometria con ruido
 %Unico landmarks. Con tecla enter, finalizo ubicaci�n. Landmarks son
 %guaradadas en matriz M, que contiene las posiciones reales [x,y] de cada
 %landmark.
-M = ginput();
+% M = ginput();
 plot(M(:,1),M(:,2),'ob'); %grafico landmarks
 [Caras,Vertices] = conversionLandmarks(M);
 
 %Genero el camino que quiero que siga el robot, entre las landmarks. El
 %camino solo va de izquierda a derecha
-[X,Y] = ginput;
+% [X,Y] = ginput;
 xmax = max(X);
 xmin = min(X);
 
