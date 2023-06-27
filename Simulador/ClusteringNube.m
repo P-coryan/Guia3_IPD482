@@ -60,17 +60,7 @@ function [PMi, covNP, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M, distC
         vY = var(nubePtos( idx==i , 2));
         covNP{i} = [vX 0; 0 vY];
         
-        % % M
-        % sizeM = length(caractM(:,1));
-        % CP = cell(sizeM,1);
-        % for i=1:sizeM
-        %     eX = abs(errorCaractM(i, 1));
-        %     eY = abs(errorCaractM(i, 2));
-        %     CP{i} = [eX 0; 0 eY];
-        % end
-        
-        
-    
+ 
 %         plot(pGi(:,1), pGi(:,2) , '.-b','MarkerSize', 25)     % puntos mas extensos
 %         plot( PMi(i,1) , PMi(i,2) ,'.k','MarkerSize', 25)     % punto medio estimado
 %         plot(iVertices(:,1), iVertices(:,2),'k')

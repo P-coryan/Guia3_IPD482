@@ -1,10 +1,8 @@
 
 % Caso 1: Conocemos todas las caracteristicas apriori
-
+% Caso 2: No Conocemos todas las caracteristicas apriori
 function [xhat, P] = init_KalmanFilter(Laser, robot, M, flag) %robot_hat
-    
-    covCaract_init = 0;
-    
+       
     if flag == 1
         % Mapa conocido apriori
         M = reshape(M', [], 1);

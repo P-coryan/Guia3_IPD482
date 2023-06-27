@@ -27,11 +27,6 @@ function x = DeteccionPostes(Laser,robot)
     x = globalCandidates;
     
     
-%     al parecer DeteccionPostes es en coordenadas locales del robot
-%    pasar primero a global y despues analizar para no realizar el mismo
-%    calculo en caso de que el lidar vea el mismo poste desde otro punto de
-%    vista
-
 %     -> r < Rmax
 %     -> robot.tita y angulo(r < Rmax)
 %     -> agregarlos a una matriz
