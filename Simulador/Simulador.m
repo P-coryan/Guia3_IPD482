@@ -96,7 +96,7 @@ for cont = 2:length(xx)-1
     %## FILTRO KALMAN (ESTIMACION POSE ROBOT)##%
     %##########################################%
     % (1== SI conocemos las caract)(0== NO conocemos las caract)
-    knowMap = 0;
+    knowMap = 1;
     if cont == 2 
         [xhat, P] = init_KalmanFilter(Laser, robot, M, knowMap);    
     else
