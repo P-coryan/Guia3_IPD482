@@ -96,10 +96,11 @@ for cont = 2:length(xx)-1
     %## FILTRO KALMAN (ESTIMACION POSE ROBOT)##%
     %##########################################%
     % (1== SI conocemos las caract)(0== NO conocemos las caract)
-    knowMap = 0;
+    knowMap = 1;
     if cont == 2 
         [xhat, P] = init_KalmanFilter(Laser, robot, M, knowMap);    
     else
+        % [xhat, P] = FiltroKalman_version1(Laser ,xhat ,P , V, W, pasoTiempo, cont);
         [xhat, P] = FiltroKalman_Odometric(Laser ,xhat ,P , V, W, pasoTiempo, cont, knowMap);
     end
     robot_hat.x = xhat(1,cont);
@@ -156,11 +157,6 @@ for cont = 2:length(xx)-1
    
 %     pause(pasoTiempo);
     pause(1e-5);
-    
-    if cont == length(xx)-1
-        disp('final')
-    end
-    
     
     delete(H1);
     delete(H2);
