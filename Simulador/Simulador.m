@@ -168,7 +168,7 @@ end
 
 %% Pregunta 1 Robot Odometrico sin error
 % Obtencion de Caracteristica M y su covarianza
-[caractM_1, cov_caractM_1, error_caractM_1, label_caractM_1, idx_1] = ClusteringNube(nubePtos_1, M, 0.1, 4);
+[caractM_1, cov_caractM_1, error_caractM_1, Edist_caractM_1, label_caractM_1, idx_1] = ClusteringNube(nubePtos_1, M, 0.1, 4);
 
 figure()
 title('Clustering Nube (Robot Odometrico sin error)')
@@ -180,7 +180,7 @@ plot( caractM_1(:,1) , caractM_1(:,2) ,'.k','MarkerSize', 25)   % caracteristica
 %% Pregunta 2 Robot Odometrico con error
 % idem anterior cambiando la deteccionPostes a robot 1 en Linea 79 codigo.
 % Obtencion de Caracteristica M y su covarianza
-[caractM_2, cov_caractM_2, error_caractM_2, label_caractM_2, idx_2] = ClusteringNube(nubePtos_2, M, 0.1, 4);
+[caractM_2, cov_caractM_2, error_caractM_2, Edist_caractM_2, label_caractM_2, idx_2] = ClusteringNube(nubePtos_2, M, 0.1, 4);
 
 figure()
 title('Clustering Nube (Robot Odometrico con error)')

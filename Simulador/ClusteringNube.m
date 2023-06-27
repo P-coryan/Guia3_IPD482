@@ -1,4 +1,4 @@
-function [PMi, covNP, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M, distCluster, cantCluster)
+function [PMi, covNP, EPC,  Edist, posteYgrupo, idx] = ClusteringNube(nubePtos, M, distCluster, cantCluster)
     % Clustering postes Global total
     [idx, ~] = dbscan(nubePtos, distCluster, cantCluster);  % (data, dist max entre Vecinos, n�Min de Vecinos para formar grupo)
 
@@ -18,7 +18,7 @@ function [PMi, covNP, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M, distC
     
     % Inicializacion Error caracteristica (valor estimado con valor real)
     EPC = zeros(largoGrupos,2);
-   
+    Edist = zeros(largoGrupos,1);
     % Inicializacion Covarianza de postes 
     covNP= cell(largoGrupos,1);
     
@@ -54,6 +54,9 @@ function [PMi, covNP, EPC, posteYgrupo, idx] = ClusteringNube(nubePtos, M, distC
         
         % Error de cada coordenada del poste estimado
         EPC(i,:) = abs(PMi(i,:) - M(posteID,:));
+        
+        % Error de la distancia entre poste y su estimacion
+        Edist(i,:) = norm(M(posteID,:) - PMi(i,:));
         
         % Obtencion Matriz Covarianza de cada caracteristica estimada
         vX = var(nubePtos( idx==i , 1));
