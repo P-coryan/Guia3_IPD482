@@ -79,8 +79,8 @@ for cont = 2:length(xx)-1
 
     % ###########################   
     %Sensado de Postes (LASER)  con robot2
-    Laser = MedicionConLaserRapido(Vertices, Caras, robot2);    
-%     H3 = plotLaser(Laser,robot2);
+    Laser = MedicionConLaserRapido(Vertices, Caras, robot);    
+%     H3 = plotLaser(Laser,robot);
     
     % Deteccion de Postes (NUBE DE PUNTOS) Robot odometrico sin error
     BuscoPostes_1 = [];
@@ -151,7 +151,7 @@ for cont = 2:length(xx)-1
     %####### GRAFICAS ROBOTS ##########%
     H1=plotRobot(robot);            % robot sin ruido(gris)
     H2=plotRobot2(robot2);          % robot ruidoso (verde)
-    H3 = plotLaser(Laser,robot2);   % Laser
+    H3 = plotLaser(Laser,robot);   % Laser
     H4=plotRobot_hat(robot_hat);    % (rojo)
 %     H5=plotLaser_hat(Laser,robot_hat);  %(Laser_hat Blue de linea continua)
    
