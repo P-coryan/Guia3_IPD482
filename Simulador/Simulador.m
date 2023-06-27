@@ -157,11 +157,6 @@ for cont = 2:length(xx)-1
 %     pause(pasoTiempo);
     pause(1e-5);
     
-    if cont == length(xx)-1
-        disp('final')
-    end
-    
-    
     delete(H1);
     delete(H2);
     delete(H3);
